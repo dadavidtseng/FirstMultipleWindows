@@ -1,4 +1,5 @@
 #define WIN32_LEAN_AND_MEAN		// Always #define this before #including <windows.h>
+
 #include <cstdio>
 #include <iostream>
 #include <windows.h>			// #include this (massive, platform-specific) header in VERY few places (and .CPPs only)

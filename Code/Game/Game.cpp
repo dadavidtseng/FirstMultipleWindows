@@ -109,7 +109,7 @@ void Game::UpdateFromInput()
         if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
         {
             ChangeGameState(eGameState::GAME);
-            SoundID const clickSound = g_theAudio->CreateOrGetSound("Data/Audio/TestSound.mp3", AudioSystemSoundDimension::Sound2D);
+            SoundID const clickSound = g_theAudio->CreateOrGetSound("Data/Audio/TestSound.mp3", eAudioSystemSoundDimension::Sound2D);
             g_theAudio->StartSound(clickSound, false, 1.f, 0.f, 0.5f);
         }
     }
@@ -118,7 +118,7 @@ void Game::UpdateFromInput()
         if (g_theInput->WasKeyJustPressed(KEYCODE_ESC))
         {
             ChangeGameState(eGameState::ATTRACT);
-            SoundID const clickSound = g_theAudio->CreateOrGetSound("Data/Audio/TestSound.mp3", AudioSystemSoundDimension::Sound2D);
+            SoundID const clickSound = g_theAudio->CreateOrGetSound("Data/Audio/TestSound.mp3", eAudioSystemSoundDimension::Sound2D);
             g_theAudio->StartSound(clickSound);
         }
     }
