@@ -30,6 +30,7 @@ public:
     void Render() const;
 
     static bool OnGameStateChanged(EventArgs& args);
+    static bool OnWindowSizeChanged(EventArgs& args);
 
     eGameState GetCurrentGameState() const;
     void       ChangeGameState(eGameState newGameState);

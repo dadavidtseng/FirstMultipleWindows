@@ -8,6 +8,7 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
 #include "Engine/Renderer/Renderer.hpp"
@@ -17,10 +18,12 @@
 //----------------------------------------------------------------------------------------------------
 Game::Game()
 {
+    g_theEventSystem->SubscribeEventCallbackFunction("OnWindowSizeChanged", OnWindowSizeChanged);
     m_screenCamera = new Camera();
 
     Vec2 const bottomLeft     = Vec2::ZERO;
-    Vec2 const screenTopRight = Vec2(SCREEN_SIZE_X, SCREEN_SIZE_Y);
+    // Vec2 const screenTopRight = Vec2(SCREEN_SIZE_X, SCREEN_SIZE_Y);
+    Vec2 const screenTopRight = Vec2(1920.0f, 1080.0f);
 
     m_screenCamera->SetOrthoGraphicView(bottomLeft, screenTopRight);
     m_screenCamera->SetNormalizedViewport(AABB2::ZERO_TO_ONE);
@@ -74,6 +77,15 @@ bool Game::OnGameStateChanged(EventArgs& args)
         App::RequestQuit();
     }
 
+    return true;
+}
+
+bool Game::OnWindowSizeChanged(EventArgs& args)
+{
+    int newHeight = args.GetValue("newHeight", -1);
+    int newWidth = args.GetValue("newWidth", -1);
+    DebuggerPrintf("OnWindowSizeChanged (%d, %d)\n",  newWidth, newHeight);
+    // g_theGame->m_screenCamera->SetViewport(AABB2(Vec2::ZERO, Vec2(newWidth, newHeight)));
     return true;
 }
 
@@ -151,6 +163,19 @@ void Game::AdjustForPauseAndTimeDistortion()
 //----------------------------------------------------------------------------------------------------
 void Game::RenderAttractMode() const
 {
+
+    VertexList_PCU verts;
+    AddVertsForAABB2D(verts, AABB2(Vec2::ZERO, Vec2(1920.0f, 1080.0f)));
+    g_theRenderer->SetModelConstants();
+    g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
+    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+    g_theRenderer->SetSamplerMode(eSamplerMode::BILINEAR_CLAMP);
+    g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
+    // g_theRenderer->BindTexture(nullptr);
+    g_theRenderer->BindTexture(g_theRenderer->CreateOrGetTextureFromFile("Data/Images/Test_StbiFlippedAndOpenGL.png"));
+    g_theRenderer->BindShader(g_theRenderer->CreateOrGetShaderFromFile("Data/Shaders/Default"));
+    g_theRenderer->DrawVertexArray(verts);
+
     DebugDrawRing(Vec2(800.f, 400.f), 300.f, 10.f, Rgba8::YELLOW);
 }
 
