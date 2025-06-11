@@ -13,6 +13,7 @@ class AudioSystem;
 class BitmapFont;
 class Game;
 class Renderer;
+class RendererEx;
 class RandomNumberGenerator;
 
 // one-time declaration
@@ -21,6 +22,7 @@ extern AudioSystem*           g_theAudio;
 extern BitmapFont*            g_theBitmapFont;
 extern Game*                  g_theGame;
 extern Renderer*              g_theRenderer;
+extern RendererEx*              g_theRendererEx;
 extern RandomNumberGenerator* g_theRNG;
 
 //-----------------------------------------------------------------------------------------------

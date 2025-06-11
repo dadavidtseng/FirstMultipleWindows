@@ -8,6 +8,7 @@
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/Renderer.hpp"
+#include "Engine/Renderer/RendererEx.hpp"
 
 //-----------------------------------------------------------------------------------------------
 // DebugRender color-related
@@ -74,13 +75,13 @@ void DebugDrawRing(Vec2 const& center, float radius, float thickness, Rgba8 cons
         verts[vertIndexF].m_color    = color;
     }
 
-    g_theRenderer->SetModelConstants();
-    g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
-    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
-    g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
-    g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
-    g_theRenderer->BindTexture(nullptr);
-    g_theRenderer->DrawVertexArray(NUM_VERTS, &verts[0]);
+    g_theRendererEx->SetModelConstants();
+    g_theRendererEx->SetBlendMode(RendererEx::eBlendMode::ALPHA);
+    g_theRendererEx->SetRasterizerMode(RendererEx::eRasterizerMode::SOLID_CULL_NONE);
+    g_theRendererEx->SetSamplerMode(RendererEx::eSamplerMode::POINT_CLAMP);
+    g_theRendererEx->SetDepthMode(RendererEx::eDepthMode::DISABLED);
+    g_theRendererEx->BindTexture(nullptr);
+    g_theRendererEx->DrawVertexArray(NUM_VERTS, &verts[0]);
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -112,13 +113,13 @@ void DebugDrawLine(Vec2 const& start, Vec2 const& end, float thickness, Rgba8 co
     verts[4].m_color    = color;
     verts[5].m_color    = color;
 
-    g_theRenderer->SetModelConstants();
-    g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
-    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
-    g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
-    g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
-    g_theRenderer->BindTexture(nullptr);
-    g_theRenderer->DrawVertexArray(6, &verts[0]);
+    g_theRendererEx->SetModelConstants();
+    g_theRendererEx->SetBlendMode(RendererEx::eBlendMode::ALPHA);
+    g_theRendererEx->SetRasterizerMode(RendererEx::eRasterizerMode::SOLID_CULL_NONE);
+    g_theRendererEx->SetSamplerMode(RendererEx::eSamplerMode::POINT_CLAMP);
+    g_theRendererEx->SetDepthMode(RendererEx::eDepthMode::DISABLED);
+    g_theRendererEx->BindTexture(nullptr);
+    g_theRendererEx->DrawVertexArray(6, &verts[0]);
 }
 
 //------------------------------------------------------------------------------------------------
@@ -167,7 +168,7 @@ void DebugDrawGlowCircle(Vec2 const& center, float radius, Rgba8 const& color, f
         verts[vertIndexC].m_color = glowColor;
     }
 
-    g_theRenderer->DrawVertexArray(NUM_VERTS, &verts[0]);
+    g_theRendererEx->DrawVertexArray(NUM_VERTS, &verts[0]);
 }
 
 void DebugDrawGlowBox(Vec2 const& center, Vec2 const& dimensions, Rgba8 const& color, float glowIntensity)
@@ -214,7 +215,7 @@ void DebugDrawGlowBox(Vec2 const& center, Vec2 const& dimensions, Rgba8 const& c
     }
 
     // Draw the vertex array
-    g_theRenderer->DrawVertexArray(NUM_VERTS, &verts[0]);
+    g_theRendererEx->DrawVertexArray(NUM_VERTS, &verts[0]);
 }
 
 
@@ -280,5 +281,5 @@ void DebugDrawBoxRing(Vec2 const& center, float radius, float thickness, Rgba8 c
         verts[i].m_color = color;
     }
 
-    g_theRenderer->DrawVertexArray(24, &verts[0]);
+    g_theRendererEx->DrawVertexArray(24, &verts[0]);
 }

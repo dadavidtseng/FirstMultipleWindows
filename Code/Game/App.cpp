@@ -13,8 +13,10 @@
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
+#include "Engine/Renderer/RendererEx.hpp"
 #include "Engine/Renderer/Renderer.hpp"
-#include "Engine/Renderer/Window.hpp"
+#include "Engine/Platform/Window.hpp"
+#include "Engine/Platform/WindowEx.hpp"
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 
@@ -24,8 +26,10 @@ AudioSystem*           g_theAudio      = nullptr;       // Created and owned by 
 BitmapFont*            g_theBitmapFont = nullptr;       // Created and owned by the App
 Game*                  g_theGame       = nullptr;       // Created and owned by the App
 Renderer*              g_theRenderer   = nullptr;       // Created and owned by the App
+RendererEx*              g_theRendererEx   = nullptr;       // Created and owned by the App
 RandomNumberGenerator* g_theRNG        = nullptr;       // Created and owned by the App
 Window*                g_theWindow     = nullptr;       // Created and owned by the App
+WindowEx*                g_theWindowEx     = nullptr;       // Created and owned by the App
 
 //----------------------------------------------------------------------------------------------------
 STATIC bool App::m_isQuitting = false;
@@ -56,16 +60,27 @@ void App::Startup()
     sWindowConfig windowConfig;
     windowConfig.m_aspectRatio = 2.f;
     windowConfig.m_inputSystem = g_theInput;
-    windowConfig.m_windowTitle = "FirstMultipleWindows";
+    windowConfig.m_windowTitle = "DEFAULT";
     g_theWindow                = new Window(windowConfig);
+
+    sWindowExConfig windowExConfig;
+    windowExConfig.m_aspectRatio = 2.f;
+    windowExConfig.m_inputSystem = g_theInput;
+    windowExConfig.m_windowTitle = "FirstMultipleWindows";
+    windowExConfig.m_iconFilePath =L"C:/p4/Personal/SD/FirstMultipleWindows/Run/Data/Images/Test_StbiFlippedAndOpenGL.ico";
+    g_theWindowEx                = new WindowEx(windowExConfig);
 
     //-End-of-Window----------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
     //-Start-of-Renderer------------------------------------------------------------------------------
 
-    sRenderConfig renderConfig;
+    Renderer::sRenderConfig renderConfig;
     renderConfig.m_window = g_theWindow;
     g_theRenderer         = new Renderer(renderConfig);
+
+    RendererEx::sRenderExConfig renderExConfig;
+    renderExConfig.m_window = g_theWindowEx;
+    g_theRendererEx         = new RendererEx(renderExConfig);
 
     //-End-of-Renderer--------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
@@ -103,13 +118,15 @@ void App::Startup()
 
     g_theEventSystem->Startup();
     g_theWindow->Startup();
+    g_theWindowEx->Startup();
     g_theRenderer->Startup();
+    g_theRendererEx->Startup();
     DebugRenderSystemStartup(debugConfig);
     g_theDevConsole->StartUp();
     g_theInput->Startup();
     g_theAudio->Startup();
 
-    g_theBitmapFont = g_theRenderer->CreateOrGetBitmapFontFromFile("Data/Fonts/SquirrelFixedFont"); // DO NOT SPECIFY FILE .EXTENSION!!  (Important later on.)
+    g_theBitmapFont = g_theRendererEx->CreateOrGetBitmapFontFromFile("Data/Fonts/SquirrelFixedFont"); // DO NOT SPECIFY FILE .EXTENSION!!  (Important later on.)
     g_theRNG        = new RandomNumberGenerator();
     g_theGame       = new Game();
 }
@@ -131,12 +148,16 @@ void App::Shutdown()
     SafeDeletePointer(m_devConsoleCamera);
 
     DebugRenderSystemShutdown();
+    g_theRendererEx->Shutdown();
     g_theRenderer->Shutdown();
+    g_theWindowEx->Shutdown();
     g_theWindow->Shutdown();
     g_theEventSystem->Shutdown();
 
     SafeDeletePointer(g_theAudio);
+    SafeDeletePointer(g_theRendererEx);
     SafeDeletePointer(g_theRenderer);
+    SafeDeletePointer(g_theWindowEx);
     SafeDeletePointer(g_theWindow);
     SafeDeletePointer(g_theInput);
 }
@@ -184,7 +205,9 @@ void App::BeginFrame() const
 {
     g_theEventSystem->BeginFrame();
     g_theWindow->BeginFrame();
+    g_theWindowEx->BeginFrame();
     g_theRenderer->BeginFrame();
+    g_theRendererEx->BeginFrame();
     DebugRenderBeginFrame();
     g_theDevConsole->BeginFrame();
     g_theInput->BeginFrame();
@@ -211,7 +234,7 @@ void App::Render() const
 {
     Rgba8 const clearColor = Rgba8(0, 0, 0, 0);
 
-    g_theRenderer->ClearScreen(clearColor);
+    g_theRendererEx->ClearScreen(clearColor);
     g_theGame->Render();
 
     AABB2 const box = AABB2(Vec2::ZERO, Vec2(1600.f, 30.f));
@@ -224,7 +247,9 @@ void App::EndFrame() const
 {
     g_theEventSystem->EndFrame();
     g_theWindow->EndFrame();
+    g_theWindowEx->EndFrame();
     g_theRenderer->EndFrame();
+    g_theRendererEx->EndFrame();
     DebugRenderEndFrame();
     g_theDevConsole->EndFrame();
     g_theInput->EndFrame();
@@ -234,7 +259,7 @@ void App::EndFrame() const
 //----------------------------------------------------------------------------------------------------
 void App::UpdateCursorMode()
 {
-    bool const doesWindowHasFocus   = GetActiveWindow() == g_theWindow->GetWindowHandle();
+    bool const doesWindowHasFocus   = GetActiveWindow() == g_theWindowEx->GetWindowHandle();
     bool const isAttractState       = g_theGame->GetCurrentGameState() == eGameState::ATTRACT;
     bool const shouldUsePointerMode = !doesWindowHasFocus || g_theDevConsole->IsOpen() || isAttractState;
 

@@ -11,7 +11,7 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
-#include "Engine/Renderer/Renderer.hpp"
+#include "Engine/Renderer/RendererEx.hpp"
 #include "Game/App.hpp"
 #include "Game/GameCommon.hpp"
 
@@ -22,8 +22,8 @@ Game::Game()
     m_screenCamera = new Camera();
 
     Vec2 const bottomLeft     = Vec2::ZERO;
-    // Vec2 const screenTopRight = Vec2(SCREEN_SIZE_X, SCREEN_SIZE_Y);
-    Vec2 const screenTopRight = Vec2(1920.0f, 1080.0f);
+    Vec2 const screenTopRight = Vec2(SCREEN_SIZE_X, SCREEN_SIZE_Y);
+    // Vec2 const screenTopRight = Vec2(1920.0f, 1080.0f);
 
     m_screenCamera->SetOrthoGraphicView(bottomLeft, screenTopRight);
     m_screenCamera->SetNormalizedViewport(AABB2::ZERO_TO_ONE);
@@ -48,7 +48,7 @@ void Game::Update()
 void Game::Render() const
 {
     //-Start-of-Screen-Camera-------------------------------------------------------------------------
-    g_theRenderer->BeginCamera(*m_screenCamera);
+    g_theRendererEx->BeginCamera(*m_screenCamera);
 
     if (m_gameState == eGameState::ATTRACT)
     {
@@ -59,7 +59,7 @@ void Game::Render() const
         RenderGame();
     }
 
-    g_theRenderer->EndCamera(*m_screenCamera);
+    g_theRendererEx->EndCamera(*m_screenCamera);
     //-End-of-Screen-Camera---------------------------------------------------------------------------
 
     if (m_gameState == eGameState::GAME)
@@ -83,8 +83,8 @@ bool Game::OnGameStateChanged(EventArgs& args)
 bool Game::OnWindowSizeChanged(EventArgs& args)
 {
     int newHeight = args.GetValue("newHeight", -1);
-    int newWidth = args.GetValue("newWidth", -1);
-    DebuggerPrintf("OnWindowSizeChanged (%d, %d)\n",  newWidth, newHeight);
+    int newWidth  = args.GetValue("newWidth", -1);
+    DebuggerPrintf("OnWindowSizeChanged (%d, %d)\n", newWidth, newHeight);
     // g_theGame->m_screenCamera->SetViewport(AABB2(Vec2::ZERO, Vec2(newWidth, newHeight)));
     return true;
 }
@@ -163,18 +163,17 @@ void Game::AdjustForPauseAndTimeDistortion()
 //----------------------------------------------------------------------------------------------------
 void Game::RenderAttractMode() const
 {
-
     VertexList_PCU verts;
-    AddVertsForAABB2D(verts, AABB2(Vec2::ZERO, Vec2(1920.0f, 1080.0f)));
-    g_theRenderer->SetModelConstants();
-    g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
-    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
-    g_theRenderer->SetSamplerMode(eSamplerMode::BILINEAR_CLAMP);
-    g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
+    AddVertsForAABB2D(verts, AABB2(Vec2::ZERO, Vec2(1600.0f, 800.0f)));
+    g_theRendererEx->SetModelConstants();
+    g_theRendererEx->SetBlendMode(RendererEx::eBlendMode::ALPHA);
+    g_theRendererEx->SetRasterizerMode(RendererEx::eRasterizerMode::SOLID_CULL_NONE);
+    g_theRendererEx->SetSamplerMode(RendererEx::eSamplerMode::BILINEAR_CLAMP);
+    g_theRendererEx->SetDepthMode(RendererEx::eDepthMode::DISABLED);
     // g_theRenderer->BindTexture(nullptr);
-    g_theRenderer->BindTexture(g_theRenderer->CreateOrGetTextureFromFile("Data/Images/Test_StbiFlippedAndOpenGL.png"));
-    g_theRenderer->BindShader(g_theRenderer->CreateOrGetShaderFromFile("Data/Shaders/Default"));
-    g_theRenderer->DrawVertexArray(verts);
+    g_theRendererEx->BindTexture(g_theRendererEx->CreateOrGetTextureFromFile("Data/Images/Test_StbiFlippedAndOpenGL.png"));
+    g_theRendererEx->BindShader(g_theRendererEx->CreateOrGetShaderFromFile("Data/Shaders/Default"));
+    g_theRendererEx->DrawVertexArray(verts);
 
     DebugDrawRing(Vec2(800.f, 400.f), 300.f, 10.f, Rgba8::YELLOW);
 }
@@ -182,7 +181,6 @@ void Game::RenderAttractMode() const
 //----------------------------------------------------------------------------------------------------
 void Game::RenderGame() const
 {
-
     DebugDrawLine(Vec2(100.f, 100.f), Vec2(1500.f, 700.f), 10.f, Rgba8(100, 200, 100));
     DebugDrawLine(Vec2(1500.f, 100.f), Vec2(100.f, 700.f), 10.f, Rgba8(100, 200, 100));
 }
