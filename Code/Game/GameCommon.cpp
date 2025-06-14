@@ -7,6 +7,7 @@
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Platform/WindowEx.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/RendererEx.hpp"
 
@@ -75,13 +76,13 @@ void DebugDrawRing(Vec2 const& center, float radius, float thickness, Rgba8 cons
         verts[vertIndexF].m_color    = color;
     }
 
-    g_theRendererEx->SetModelConstants();
-    g_theRendererEx->SetBlendMode(RendererEx::eBlendMode::ALPHA);
-    g_theRendererEx->SetRasterizerMode(RendererEx::eRasterizerMode::SOLID_CULL_NONE);
-    g_theRendererEx->SetSamplerMode(RendererEx::eSamplerMode::POINT_CLAMP);
-    g_theRendererEx->SetDepthMode(RendererEx::eDepthMode::DISABLED);
-    g_theRendererEx->BindTexture(nullptr);
-    g_theRendererEx->DrawVertexArray(NUM_VERTS, &verts[0]);
+    // g_theRendererEx->SetModelConstants();
+    // g_theRendererEx->SetBlendMode(RendererEx::eBlendMode::ALPHA);
+    // g_theRendererEx->SetRasterizerMode(RendererEx::eRasterizerMode::SOLID_CULL_NONE);
+    // g_theRendererEx->SetSamplerMode(RendererEx::eSamplerMode::POINT_CLAMP);
+    // g_theRendererEx->SetDepthMode(RendererEx::eDepthMode::DISABLED);
+    // g_theRendererEx->BindTexture(nullptr);
+    // g_theRendererEx->DrawVertexArray(NUM_VERTS, &verts[0]);
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -113,13 +114,13 @@ void DebugDrawLine(Vec2 const& start, Vec2 const& end, float thickness, Rgba8 co
     verts[4].m_color    = color;
     verts[5].m_color    = color;
 
-    g_theRendererEx->SetModelConstants();
-    g_theRendererEx->SetBlendMode(RendererEx::eBlendMode::ALPHA);
-    g_theRendererEx->SetRasterizerMode(RendererEx::eRasterizerMode::SOLID_CULL_NONE);
-    g_theRendererEx->SetSamplerMode(RendererEx::eSamplerMode::POINT_CLAMP);
-    g_theRendererEx->SetDepthMode(RendererEx::eDepthMode::DISABLED);
-    g_theRendererEx->BindTexture(nullptr);
-    g_theRendererEx->DrawVertexArray(6, &verts[0]);
+    // g_theRendererEx->SetModelConstants();
+    // g_theRendererEx->SetBlendMode(RendererEx::eBlendMode::ALPHA);
+    // g_theRendererEx->SetRasterizerMode(RendererEx::eRasterizerMode::SOLID_CULL_NONE);
+    // g_theRendererEx->SetSamplerMode(RendererEx::eSamplerMode::POINT_CLAMP);
+    // g_theRendererEx->SetDepthMode(RendererEx::eDepthMode::DISABLED);
+    // g_theRendererEx->BindTexture(nullptr);
+    // g_theRendererEx->DrawVertexArray(6, &verts[0]);
 }
 
 //------------------------------------------------------------------------------------------------
@@ -168,7 +169,7 @@ void DebugDrawGlowCircle(Vec2 const& center, float radius, Rgba8 const& color, f
         verts[vertIndexC].m_color = glowColor;
     }
 
-    g_theRendererEx->DrawVertexArray(NUM_VERTS, &verts[0]);
+    // g_theRendererEx->DrawVertexArray(NUM_VERTS, &verts[0]);
 }
 
 void DebugDrawGlowBox(Vec2 const& center, Vec2 const& dimensions, Rgba8 const& color, float glowIntensity)
@@ -215,7 +216,7 @@ void DebugDrawGlowBox(Vec2 const& center, Vec2 const& dimensions, Rgba8 const& c
     }
 
     // Draw the vertex array
-    g_theRendererEx->DrawVertexArray(NUM_VERTS, &verts[0]);
+    // g_theRendererEx->DrawVertexArray(NUM_VERTS, &verts[0]);
 }
 
 
@@ -281,5 +282,67 @@ void DebugDrawBoxRing(Vec2 const& center, float radius, float thickness, Rgba8 c
         verts[i].m_color = color;
     }
 
-    g_theRendererEx->DrawVertexArray(24, &verts[0]);
+    // g_theRendererEx->DrawVertexArray(24, &verts[0]);
+}
+
+void CreateAndRegisterMultipleWindows(HINSTANCE hInstance, int windowCount)
+{
+    const int width   = 400;
+    const int height  = 300;
+    const int startX  = 100;
+    const int startY  = 100;
+    const int offsetX = 450;
+    const int offsetY = 350;
+
+    for (int i = 0; i < windowCount; ++i)
+    {
+        std::wstring title = L"ChildWindow " + std::to_wstring(i + 1);
+        int          x     = startX + (i % 5) * offsetX;       // 每列最多5個視窗
+        int          y     = startY + (i / 5) * offsetY;       // 每滿5個換行
+
+        HWND hwnd = CreateGameWindow(hInstance, title.c_str(), x, y, width, height);
+        if (hwnd)
+        {
+            g_gameWindows.push_back(hwnd);
+            g_theRendererEx->AddWindow(hwnd);
+        }
+    }
+}
+
+// 創建窗口
+HWND CreateGameWindow(HINSTANCE hInstance, const wchar_t* title, int x, int y, int width, int height)
+{
+    // static bool classRegistered = false;
+    // if (!classRegistered)
+    // {
+    WNDCLASS wc      = {};
+    wc.lpfnWndProc   = WindowsExMessageHandlingProcedure;
+    wc.hInstance     = hInstance;
+    wc.lpszClassName = L"GameWindow";
+    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wc.hCursor       = LoadCursor(nullptr, IDC_ARROW);
+
+    RegisterClass(&wc);
+    // classRegistered = true;
+    // }
+
+    HWND hwnd = CreateWindowEx(
+        0,
+        L"GameWindow",
+        title,
+        WS_OVERLAPPEDWINDOW,
+        x, y, width, height,
+        nullptr,
+        nullptr,
+        hInstance,
+        nullptr
+    );
+
+    if (hwnd)
+    {
+        ShowWindow(hwnd, SW_SHOW);
+        // UpdateWindow(hwnd);
+    }
+
+    return hwnd;
 }

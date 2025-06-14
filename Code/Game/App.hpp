@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------
 #pragma once
 #include "Engine/Core/EventSystem.hpp"
+#include "Engine/Platform/WindowEx.hpp"
 
 //-Forward-Declaration--------------------------------------------------------------------------------
 class Camera;
@@ -33,5 +34,6 @@ private:
     void EndFrame() const;
     void UpdateCursorMode();
 
-    Camera* m_devConsoleCamera = nullptr;
+    Camera*                m_devConsoleCamera = nullptr;
+    std::vector<WindowEx*> m_windowExs;
 };

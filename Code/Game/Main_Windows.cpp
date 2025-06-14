@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <iostream>
+#include <OleCtl.h>
 #include <windows.h>			// #include this (massive, platform-specific) header in VERY few places (and .CPPs only)
 #include "Engine/Core/EngineCommon.hpp"
 #include "Game/App.hpp"
@@ -13,6 +14,7 @@ int WINAPI WinMain(HINSTANCE const applicationInstanceHandle,
                    LPSTR const commandLineString,
                    int)
 {
+    CoInitialize(nullptr);
     UNUSED(applicationInstanceHandle)
     UNUSED(commandLineString)
 

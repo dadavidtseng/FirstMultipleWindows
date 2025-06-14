@@ -4,7 +4,7 @@
 
 //----------------------------------------------------------------------------------------------------
 #pragma once
-
+#include <windows.h>
 //-Forward-Declaration--------------------------------------------------------------------------------
 struct Rgba8;
 struct Vec2;
@@ -50,3 +50,6 @@ void SafeDeletePointer(T*& pointer)
         pointer = nullptr;
     }
 }
+
+void CreateAndRegisterMultipleWindows(HINSTANCE hInstance, int windowCount);
+HWND CreateGameWindow(HINSTANCE hInstance, const wchar_t* title, int x, int y, int width, int height);
