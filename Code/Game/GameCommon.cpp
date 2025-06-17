@@ -4,6 +4,8 @@
 
 //-----------------------------------------------------------------------------------------------
 #include "Game/GameCommon.hpp"
+
+#include "App.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Math/MathUtils.hpp"
@@ -304,7 +306,7 @@ void CreateAndRegisterMultipleWindows(HINSTANCE hInstance, int windowCount)
         if (hwnd)
         {
             g_gameWindows.push_back(hwnd);
-            g_theRendererEx->AddWindow(hwnd);
+            g_theApp->AddWindow(hwnd);
         }
     }
 }
@@ -312,19 +314,19 @@ void CreateAndRegisterMultipleWindows(HINSTANCE hInstance, int windowCount)
 // 創建窗口
 HWND CreateGameWindow(HINSTANCE hInstance, const wchar_t* title, int x, int y, int width, int height)
 {
-    // static bool classRegistered = false;
-    // if (!classRegistered)
-    // {
+    static bool classRegistered = false;
+    if (!classRegistered)
+    {
     WNDCLASS wc      = {};
-    wc.lpfnWndProc   = WindowsExMessageHandlingProcedure;
+    wc.lpfnWndProc   = WindowsMessageHandlingProcedure;
     wc.hInstance     = hInstance;
     wc.lpszClassName = L"GameWindow";
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wc.hCursor       = LoadCursor(nullptr, IDC_ARROW);
 
     RegisterClass(&wc);
-    // classRegistered = true;
-    // }
+    classRegistered = true;
+    }
 
     HWND hwnd = CreateWindowEx(
         0,

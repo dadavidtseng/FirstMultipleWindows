@@ -4,6 +4,7 @@
 
 //----------------------------------------------------------------------------------------------------
 #pragma once
+#include <vector>
 #include <windows.h>
 //-Forward-Declaration--------------------------------------------------------------------------------
 struct Rgba8;
@@ -22,8 +23,9 @@ extern AudioSystem*           g_theAudio;
 extern BitmapFont*            g_theBitmapFont;
 extern Game*                  g_theGame;
 extern Renderer*              g_theRenderer;
-extern RendererEx*              g_theRendererEx;
+extern RendererEx*            g_theRendererEx;
 extern RandomNumberGenerator* g_theRNG;
+extern std::vector<HWND>      g_gameWindows;
 
 //-----------------------------------------------------------------------------------------------
 // initial settings

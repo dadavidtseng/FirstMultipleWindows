@@ -15,7 +15,7 @@ class Game;
 class App
 {
 public:
-    App()  = default;
+    App(HINSTANCE const& hInstance);
     ~App() = default;
     void Startup();
     void Shutdown();
@@ -27,6 +27,8 @@ public:
     static void RequestQuit();
     static bool m_isQuitting;
 
+    void AddWindow(HWND const& hwnd);
+
 private:
     void BeginFrame() const;
     void Update();
@@ -34,6 +36,7 @@ private:
     void EndFrame() const;
     void UpdateCursorMode();
 
-    Camera*                m_devConsoleCamera = nullptr;
-    std::vector<WindowEx*> m_windowExs;
+    HINSTANCE             m_hInstance;
+    Camera*               m_devConsoleCamera = nullptr;
+    std::vector<WindowEx> windows;
 };

@@ -21,18 +21,24 @@
 #include "Game/GameCommon.hpp"
 
 //----------------------------------------------------------------------------------------------------
-App*                   g_theApp        = nullptr;       // Created and owned by Main_Windows.cpp
-AudioSystem*           g_theAudio      = nullptr;       // Created and owned by the App
-BitmapFont*            g_theBitmapFont = nullptr;       // Created and owned by the App
-Game*                  g_theGame       = nullptr;       // Created and owned by the App
-Renderer*              g_theRenderer   = nullptr;       // Created and owned by the App
-RendererEx*            g_theRendererEx = nullptr;       // Created and owned by the App
-RandomNumberGenerator* g_theRNG        = nullptr;       // Created and owned by the App
-Window*                g_theWindow     = nullptr;       // Created and owned by the App
-WindowEx*              g_theWindowEx   = nullptr;       // Created and owned by the App
+App*         g_theApp        = nullptr;       // Created and owned by Main_Windows.cpp
+AudioSystem* g_theAudio      = nullptr;       // Created and owned by the App
+BitmapFont*  g_theBitmapFont = nullptr;       // Created and owned by the App
+Game*        g_theGame       = nullptr;       // Created and owned by the App
+Renderer*    g_theRenderer   = nullptr;       // Created and owned by the App
+
+RandomNumberGenerator* g_theRNG      = nullptr;       // Created and owned by the App
+Window*                g_theWindow   = nullptr;       // Created and owned by the App
+WindowEx*              g_theWindowEx = nullptr;       // Created and owned by the App
+std::vector<HWND>      g_gameWindows;
 
 //----------------------------------------------------------------------------------------------------
 STATIC bool App::m_isQuitting = false;
+
+App::App(HINSTANCE const& hInstance)
+    : m_hInstance(hInstance)
+{
+}
 
 //----------------------------------------------------------------------------------------------------
 /// @brief
@@ -63,12 +69,12 @@ void App::Startup()
     // windowConfig.m_windowTitle = "DEFAULT";
     // g_theWindow                = new Window(windowConfig);
 
-    sWindowExConfig windowExConfig;
-    windowExConfig.m_aspectRatio  = 2.f;
-    windowExConfig.m_inputSystem  = g_theInput;
-    windowExConfig.m_windowTitle  = "FirstMultipleWindows";
-    windowExConfig.m_iconFilePath = L"C:/p4/Personal/SD/FirstMultipleWindows/Run/Data/Images/Test_StbiFlippedAndOpenGL.ico";
-    g_theWindowEx                 = new WindowEx(windowExConfig);
+    // sWindowExConfig windowExConfig;
+    // windowExConfig.m_aspectRatio  = 2.f;
+    // windowExConfig.m_inputSystem  = g_theInput;
+    // windowExConfig.m_windowTitle  = "FirstMultipleWindows";
+    // windowExConfig.m_iconFilePath = L"C:/p4/Personal/SD/FirstMultipleWindows/Run/Data/Images/Test_StbiFlippedAndOpenGL.ico";
+    // g_theWindowEx                 = new WindowEx(windowExConfig);
 
 
     //-End-of-Window----------------------------------------------------------------------------------
@@ -79,9 +85,15 @@ void App::Startup()
     // renderConfig.m_window = g_theWindow;
     // g_theRenderer         = new Renderer(renderConfig);
 
-    RendererEx::sRenderExConfig renderExConfig;
-    renderExConfig.m_window = g_theWindowEx;
-    g_theRendererEx         = new RendererEx(renderExConfig);
+    // RendererEx::sRenderExConfig renderExConfig;
+    // renderExConfig.m_window = g_theWindowEx;
+    // g_theRendererEx         = new RendererEx(renderExConfig);
+    // 初始化渲染器
+    g_theRendererEx = new RendererEx();
+    if (FAILED(g_theRendererEx->Initialize()))
+    {
+        MessageBox(nullptr, L"Failed to initialize renderer", L"Error", MB_OK);
+    }
 
     //-End-of-Renderer--------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
@@ -119,18 +131,18 @@ void App::Startup()
 
     g_theEventSystem->Startup();
     // g_theWindow->Startup();
-    g_theWindowEx->Startup();
-    WindowEx* window1             = g_theWindowEx->CreateChildWindow(L"ChildWindow", 100, 100, 400, 300);
-    WindowEx* window2             = g_theWindowEx->CreateChildWindow(L"ChildWindow", 600, 200, 400, 300);
+    // g_theWindowEx->Startup();
+    // WindowEx* window1             = g_theWindowEx->CreateChildWindow(L"ChildWindow", 100, 100, 400, 300);
+    // WindowEx* window2             = g_theWindowEx->CreateChildWindow(L"ChildWindow", 600, 200, 400, 300);
     // WindowEx* window3             = g_theWindowEx->CreateChildWindow(L"ChildWindow 3", 300, 400, 400, 300);
-    if (window1 != nullptr)
-    {
-        m_windowExs.push_back(window1);
-    }
-    if (window2 != nullptr)
-    {
-        m_windowExs.push_back(window2);
-    }
+    // if (window1 != nullptr)
+    // {
+    //     m_windowExs.push_back(window1);
+    // }
+    // if (window2 != nullptr)
+    // {
+    //     m_windowExs.push_back(window2);
+    // }
     // m_windowExs.push_back(window3);
     // g_theRenderer->Startup();
     g_theRendererEx->Startup();
@@ -140,10 +152,10 @@ void App::Startup()
     g_theAudio->Startup();
 
     // g_theBitmapFont = g_theRendererEx->CreateOrGetBitmapFontFromFile("Data/Fonts/SquirrelFixedFont"); // DO NOT SPECIFY FILE .EXTENSION!!  (Important later on.)
-    g_theRNG        = new RandomNumberGenerator();
-    g_theGame       = new Game();
+    g_theRNG  = new RandomNumberGenerator();
+    g_theGame = new Game();
 
-
+    CreateAndRegisterMultipleWindows(m_hInstance, 3);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -151,6 +163,11 @@ void App::Startup()
 //
 void App::Shutdown()
 {
+    for (WindowEx& window : windows)
+    {
+        if (window.m_displayContext) ReleaseDC((HWND)window.m_windowHandle, (HDC)window.m_displayContext);
+    }
+
     // Destroy all Engine Subsystem
     SafeDeletePointer(g_theGame);
     SafeDeletePointer(g_theRNG);
@@ -163,9 +180,9 @@ void App::Shutdown()
     SafeDeletePointer(m_devConsoleCamera);
 
     // DebugRenderSystemShutdown();
-    g_theRendererEx->Shutdown();
+    // g_theRendererEx->Shutdown();
     // g_theRenderer->Shutdown();
-    g_theWindowEx->Shutdown();
+    // g_theWindowEx->Shutdown();
     // g_theWindow->Shutdown();
     g_theEventSystem->Shutdown();
 
@@ -215,6 +232,17 @@ STATIC void App::RequestQuit()
     m_isQuitting = true;
 }
 
+void App::AddWindow(HWND const& hwnd)
+{
+    WindowEx window;
+    window.m_windowHandle   = hwnd;
+    window.m_displayContext = GetDC(hwnd);
+    window.needsUpdate      = true;
+
+    // UpdateWindowPosition(window);
+    windows.push_back(window);
+}
+
 //----------------------------------------------------------------------------------------------------
 void App::BeginFrame() const
 {
@@ -222,7 +250,7 @@ void App::BeginFrame() const
     // g_theWindow->BeginFrame();
     g_theWindowEx->BeginFrame();
     // g_theRenderer->BeginFrame();
-    g_theRendererEx->BeginFrame();
+    // g_theRendererEx->BeginFrame();
     // DebugRenderBeginFrame();
     // g_theDevConsole->BeginFrame();
     g_theInput->BeginFrame();
@@ -234,7 +262,17 @@ void App::Update()
 {
     Clock::TickSystemClock();
 
-    UpdateCursorMode();
+    if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
+    {
+CreateAndRegisterMultipleWindows(m_hInstance, 2);
+    }
+
+    // UpdateCursorMode();
+    for (WindowEx& window : windows)
+    {
+        window.UpdateWindowDrift((float)Clock::GetSystemClock().GetDeltaSeconds() * 1.5f);
+        window.UpdateWindowPosition();
+    }
     g_theGame->Update();
 }
 
@@ -250,9 +288,9 @@ void App::Render() const
     Rgba8 const clearColor = Rgba8(0, 0, 0, 0);
 
     // g_theRendererEx->ClearScreen(clearColor);
-    // g_theGame->Render();
+    g_theGame->Render();
 
-    g_theRendererEx->RenderWindows(*m_windowExs[1]);
+    g_theRendererEx->Render(windows);
     // g_theRendererEx->DebugSaveSceneTexture();
 
     AABB2 const box = AABB2(Vec2::ZERO, Vec2(1600.f, 30.f));
@@ -265,7 +303,7 @@ void App::EndFrame() const
 {
     g_theEventSystem->EndFrame();
     // g_theWindow->EndFrame();
-    g_theWindowEx->EndFrame();
+    // g_theWindowEx->EndFrame();
     // g_theRenderer->EndFrame();
     // g_theRendererEx->EndFrame();
     // DebugRenderEndFrame();
@@ -277,17 +315,17 @@ void App::EndFrame() const
 //----------------------------------------------------------------------------------------------------
 void App::UpdateCursorMode()
 {
-    bool const doesWindowHasFocus   = GetActiveWindow() == g_theWindowEx->GetWindowHandle();
-    bool const isAttractState       = g_theGame->GetCurrentGameState() == eGameState::ATTRACT;
+    // bool const doesWindowHasFocus   = GetActiveWindow() == g_theWindowEx->GetWindowHandle();
+    //bool const isAttractState       = g_theGame->GetCurrentGameState() == eGameState::ATTRACT;
     // bool const shouldUsePointerMode = !doesWindowHasFocus || g_theDevConsole->IsOpen() || isAttractState;
-    bool const shouldUsePointerMode = !doesWindowHasFocus  || isAttractState;
+    // bool const shouldUsePointerMode = !doesWindowHasFocus  || isAttractState;
 
-    if (shouldUsePointerMode == true)
-    {
-        g_theInput->SetCursorMode(CursorMode::POINTER);
-    }
-    else
-    {
-        g_theInput->SetCursorMode(CursorMode::FPS);
-    }
+    // if (shouldUsePointerMode == true)
+    // {
+    //     g_theInput->SetCursorMode(CursorMode::POINTER);
+    // }
+    // else
+    // {
+    //     g_theInput->SetCursorMode(CursorMode::FPS);
+    // }
 }
