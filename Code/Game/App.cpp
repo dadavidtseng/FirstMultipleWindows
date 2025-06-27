@@ -63,11 +63,11 @@ void App::Startup()
     //------------------------------------------------------------------------------------------------
     //-Start-of-Window--------------------------------------------------------------------------------
 
-    // sWindowConfig windowConfig;
-    // windowConfig.m_aspectRatio = 2.f;
-    // windowConfig.m_inputSystem = g_theInput;
-    // windowConfig.m_windowTitle = "DEFAULT";
-    // g_theWindow                = new Window(windowConfig);
+    sWindowConfig windowConfig;
+    windowConfig.m_aspectRatio = 2.f;
+    windowConfig.m_inputSystem = g_theInput;
+    windowConfig.m_windowTitle = "DEFAULT";
+    g_theWindow                = new Window(windowConfig);
 
     // sWindowExConfig windowExConfig;
     // windowExConfig.m_aspectRatio  = 2.f;
@@ -81,9 +81,9 @@ void App::Startup()
     //------------------------------------------------------------------------------------------------
     //-Start-of-Renderer------------------------------------------------------------------------------
 
-    // Renderer::sRenderConfig renderConfig;
-    // renderConfig.m_window = g_theWindow;
-    // g_theRenderer         = new Renderer(renderConfig);
+    sRenderConfig renderConfig;
+    renderConfig.m_window = g_theWindow;
+    g_theRenderer         = new Renderer(renderConfig);
 
     // RendererEx::sRenderExConfig renderExConfig;
     // renderExConfig.m_window = g_theWindowEx;
@@ -130,7 +130,7 @@ void App::Startup()
     //-End-of-AudioSystem-----------------------------------------------------------------------------
 
     g_theEventSystem->Startup();
-    // g_theWindow->Startup();
+    g_theWindow->Startup();
     // g_theWindowEx->Startup();
     // WindowEx* window1             = g_theWindowEx->CreateChildWindow(L"ChildWindow", 100, 100, 400, 300);
     // WindowEx* window2             = g_theWindowEx->CreateChildWindow(L"ChildWindow", 600, 200, 400, 300);
@@ -144,7 +144,7 @@ void App::Startup()
     //     m_windowExs.push_back(window2);
     // }
     // m_windowExs.push_back(window3);
-    // g_theRenderer->Startup();
+    g_theRenderer->Startup();
     g_theRendererEx->Startup();
     // DebugRenderSystemStartup(debugConfig);
     // g_theDevConsole->StartUp();
@@ -169,29 +169,29 @@ void App::Shutdown()
     }
 
     // Destroy all Engine Subsystem
-    SafeDeletePointer(g_theGame);
-    SafeDeletePointer(g_theRNG);
-    SafeDeletePointer(g_theBitmapFont);
+    GAME_SAFE_RELEASE(g_theGame);
+    GAME_SAFE_RELEASE(g_theRNG);
+    GAME_SAFE_RELEASE(g_theBitmapFont);
 
     g_theAudio->Shutdown();
     g_theInput->Shutdown();
     // g_theDevConsole->Shutdown();
 
-    SafeDeletePointer(m_devConsoleCamera);
+    GAME_SAFE_RELEASE(m_devConsoleCamera);
 
     // DebugRenderSystemShutdown();
     // g_theRendererEx->Shutdown();
-    // g_theRenderer->Shutdown();
+    g_theRenderer->Shutdown();
     // g_theWindowEx->Shutdown();
-    // g_theWindow->Shutdown();
+    g_theWindow->Shutdown();
     g_theEventSystem->Shutdown();
 
-    SafeDeletePointer(g_theAudio);
-    SafeDeletePointer(g_theRendererEx);
-    SafeDeletePointer(g_theRenderer);
-    SafeDeletePointer(g_theWindowEx);
-    SafeDeletePointer(g_theWindow);
-    SafeDeletePointer(g_theInput);
+    GAME_SAFE_RELEASE(g_theAudio);
+    GAME_SAFE_RELEASE(g_theRendererEx);
+    GAME_SAFE_RELEASE(g_theRenderer);
+    GAME_SAFE_RELEASE(g_theWindowEx);
+    GAME_SAFE_RELEASE(g_theWindow);
+    GAME_SAFE_RELEASE(g_theInput);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -247,9 +247,9 @@ void App::AddWindow(HWND const& hwnd)
 void App::BeginFrame() const
 {
     g_theEventSystem->BeginFrame();
-    // g_theWindow->BeginFrame();
-    g_theWindowEx->BeginFrame();
-    // g_theRenderer->BeginFrame();
+    g_theWindow->BeginFrame();
+    // g_theWindowEx->BeginFrame();
+    g_theRenderer->BeginFrame();
     // g_theRendererEx->BeginFrame();
     // DebugRenderBeginFrame();
     // g_theDevConsole->BeginFrame();
@@ -264,7 +264,7 @@ void App::Update()
 
     if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
     {
-CreateAndRegisterMultipleWindows(m_hInstance, 2);
+        CreateAndRegisterMultipleWindows(m_hInstance, 2);
     }
 
     // UpdateCursorMode();
@@ -287,7 +287,7 @@ void App::Render() const
 {
     Rgba8 const clearColor = Rgba8(0, 0, 0, 0);
 
-    // g_theRendererEx->ClearScreen(clearColor);
+    g_theRenderer->ClearScreen(clearColor);
     g_theGame->Render();
 
     g_theRendererEx->Render(windows);
@@ -302,9 +302,9 @@ void App::Render() const
 void App::EndFrame() const
 {
     g_theEventSystem->EndFrame();
-    // g_theWindow->EndFrame();
+    g_theWindow->EndFrame();
     // g_theWindowEx->EndFrame();
-    // g_theRenderer->EndFrame();
+    g_theRenderer->EndFrame();
     // g_theRendererEx->EndFrame();
     // DebugRenderEndFrame();
     // g_theDevConsole->EndFrame();
@@ -315,17 +315,17 @@ void App::EndFrame() const
 //----------------------------------------------------------------------------------------------------
 void App::UpdateCursorMode()
 {
-    // bool const doesWindowHasFocus   = GetActiveWindow() == g_theWindowEx->GetWindowHandle();
-    //bool const isAttractState       = g_theGame->GetCurrentGameState() == eGameState::ATTRACT;
-    // bool const shouldUsePointerMode = !doesWindowHasFocus || g_theDevConsole->IsOpen() || isAttractState;
-    // bool const shouldUsePointerMode = !doesWindowHasFocus  || isAttractState;
+     bool const doesWindowHasFocus   = GetActiveWindow() == g_theWindow->GetWindowHandle();
+    bool const isAttractState       = g_theGame->GetCurrentGameState() == eGameState::ATTRACT;
+     bool const shouldUsePointerMode = !doesWindowHasFocus || g_theDevConsole->IsOpen() || isAttractState;
+     // bool const shouldUsePointerMode = !doesWindowHasFocus  || isAttractState;
 
-    // if (shouldUsePointerMode == true)
-    // {
-    //     g_theInput->SetCursorMode(CursorMode::POINTER);
-    // }
-    // else
-    // {
-    //     g_theInput->SetCursorMode(CursorMode::FPS);
-    // }
+     if (shouldUsePointerMode == true)
+     {
+         g_theInput->SetCursorMode(eCursorMode::POINTER);
+     }
+     else
+     {
+         g_theInput->SetCursorMode(eCursorMode::FPS);
+     }
 }
