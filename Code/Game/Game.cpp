@@ -48,18 +48,18 @@ void Game::Update()
 void Game::Render() const
 {
     //-Start-of-Screen-Camera-------------------------------------------------------------------------
-    g_theRenderer->BeginCamera(*m_screenCamera);
+    // g_theRenderer->BeginCamera(*m_screenCamera);
 
     if (m_gameState == eGameState::ATTRACT)
     {
-        RenderAttractMode();
+        // RenderAttractMode();
     }
     else if (m_gameState == eGameState::GAME)
     {
-        RenderGame();
+        // RenderGame();
     }
 
-    g_theRenderer->EndCamera(*m_screenCamera);
+    // g_theRenderer->EndCamera(*m_screenCamera);
     //-End-of-Screen-Camera---------------------------------------------------------------------------
 
     if (m_gameState == eGameState::GAME)

@@ -317,15 +317,15 @@ HWND CreateGameWindow(HINSTANCE hInstance, const wchar_t* title, int x, int y, i
     static bool classRegistered = false;
     if (!classRegistered)
     {
-    WNDCLASS wc      = {};
-    wc.lpfnWndProc   = WindowsMessageHandlingProcedure;
-    wc.hInstance     = hInstance;
-    wc.lpszClassName = L"GameWindow";
-    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wc.hCursor       = LoadCursor(nullptr, IDC_ARROW);
+        WNDCLASS wc      = {};
+        wc.lpfnWndProc   = WindowsMessageHandlingProcedure;
+        wc.hInstance     = hInstance;
+        wc.lpszClassName = L"GameWindow";
+        wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+        wc.hCursor       = LoadCursor(nullptr, IDC_ARROW);
 
-    RegisterClass(&wc);
-    classRegistered = true;
+        RegisterClass(&wc);
+        classRegistered = true;
     }
 
     HWND hwnd = CreateWindowEx(

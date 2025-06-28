@@ -63,11 +63,11 @@ void App::Startup()
     //------------------------------------------------------------------------------------------------
     //-Start-of-Window--------------------------------------------------------------------------------
 
-    sWindowConfig windowConfig;
-    windowConfig.m_aspectRatio = 2.f;
-    windowConfig.m_inputSystem = g_theInput;
-    windowConfig.m_windowTitle = "DEFAULT";
-    g_theWindow                = new Window(windowConfig);
+    // sWindowConfig windowConfig;
+    // windowConfig.m_aspectRatio = 2.f;
+    // windowConfig.m_inputSystem = g_theInput;
+    // windowConfig.m_windowTitle = "DEFAULT";
+    // g_theWindow                = new Window(windowConfig);
 
     // sWindowExConfig windowExConfig;
     // windowExConfig.m_aspectRatio  = 2.f;
@@ -81,9 +81,9 @@ void App::Startup()
     //------------------------------------------------------------------------------------------------
     //-Start-of-Renderer------------------------------------------------------------------------------
 
-    sRenderConfig renderConfig;
-    renderConfig.m_window = g_theWindow;
-    g_theRenderer         = new Renderer(renderConfig);
+    // sRenderConfig renderConfig;
+    // renderConfig.m_window = g_theWindow;
+    // g_theRenderer         = new Renderer(renderConfig);
 
     // RendererEx::sRenderExConfig renderExConfig;
     // renderExConfig.m_window = g_theWindowEx;
@@ -130,7 +130,7 @@ void App::Startup()
     //-End-of-AudioSystem-----------------------------------------------------------------------------
 
     g_theEventSystem->Startup();
-    g_theWindow->Startup();
+    // g_theWindow->Startup();
     // g_theWindowEx->Startup();
     // WindowEx* window1             = g_theWindowEx->CreateChildWindow(L"ChildWindow", 100, 100, 400, 300);
     // WindowEx* window2             = g_theWindowEx->CreateChildWindow(L"ChildWindow", 600, 200, 400, 300);
@@ -144,7 +144,7 @@ void App::Startup()
     //     m_windowExs.push_back(window2);
     // }
     // m_windowExs.push_back(window3);
-    g_theRenderer->Startup();
+    // g_theRenderer->Startup();
     g_theRendererEx->Startup();
     // DebugRenderSystemStartup(debugConfig);
     // g_theDevConsole->StartUp();
@@ -181,9 +181,9 @@ void App::Shutdown()
 
     // DebugRenderSystemShutdown();
     // g_theRendererEx->Shutdown();
-    g_theRenderer->Shutdown();
+    // g_theRenderer->Shutdown();
     // g_theWindowEx->Shutdown();
-    g_theWindow->Shutdown();
+    // g_theWindow->Shutdown();
     g_theEventSystem->Shutdown();
 
     GAME_SAFE_RELEASE(g_theAudio);
@@ -247,9 +247,9 @@ void App::AddWindow(HWND const& hwnd)
 void App::BeginFrame() const
 {
     g_theEventSystem->BeginFrame();
-    g_theWindow->BeginFrame();
-    // g_theWindowEx->BeginFrame();
-    g_theRenderer->BeginFrame();
+    // g_theWindow->BeginFrame();
+    g_theWindowEx->BeginFrame();
+    // g_theRenderer->BeginFrame();
     // g_theRendererEx->BeginFrame();
     // DebugRenderBeginFrame();
     // g_theDevConsole->BeginFrame();
@@ -287,11 +287,10 @@ void App::Render() const
 {
     Rgba8 const clearColor = Rgba8(0, 0, 0, 0);
 
-    g_theRenderer->ClearScreen(clearColor);
-    g_theGame->Render();
+    // g_theRenderer->ClearScreen(clearColor);
+    // g_theGame->Render();
 
     g_theRendererEx->Render(windows);
-    // g_theRendererEx->DebugSaveSceneTexture();
 
     AABB2 const box = AABB2(Vec2::ZERO, Vec2(1600.f, 30.f));
 
@@ -302,10 +301,10 @@ void App::Render() const
 void App::EndFrame() const
 {
     g_theEventSystem->EndFrame();
-    g_theWindow->EndFrame();
+    // g_theWindow->EndFrame();
     // g_theWindowEx->EndFrame();
-    g_theRenderer->EndFrame();
-    // g_theRendererEx->EndFrame();
+    // g_theRenderer->EndFrame();
+    g_theRendererEx->EndFrame();
     // DebugRenderEndFrame();
     // g_theDevConsole->EndFrame();
     g_theInput->EndFrame();
@@ -317,8 +316,8 @@ void App::UpdateCursorMode()
 {
      bool const doesWindowHasFocus   = GetActiveWindow() == g_theWindow->GetWindowHandle();
     bool const isAttractState       = g_theGame->GetCurrentGameState() == eGameState::ATTRACT;
-     bool const shouldUsePointerMode = !doesWindowHasFocus || g_theDevConsole->IsOpen() || isAttractState;
-     // bool const shouldUsePointerMode = !doesWindowHasFocus  || isAttractState;
+     // bool const shouldUsePointerMode = !doesWindowHasFocus || g_theDevConsole->IsOpen() || isAttractState;
+     bool const shouldUsePointerMode = !doesWindowHasFocus  || isAttractState;
 
      if (shouldUsePointerMode == true)
      {

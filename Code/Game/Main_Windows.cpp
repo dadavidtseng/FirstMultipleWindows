@@ -21,58 +21,15 @@ int WINAPI WinMain(HINSTANCE const applicationInstanceHandle,
                    LPSTR const commandLineString,
                    int)
 {
-
     UNUSED(applicationInstanceHandle)
     UNUSED(commandLineString)
 
     g_theApp = new App(applicationInstanceHandle);
     g_theApp->Startup();
     g_theApp->RunMainLoop();
-    // 創建隱藏的主窗口
-
-
-
-
-
-
-    // 主訊息循環
-    // MSG  msg     = {};
-    // bool running = true;
-    //
-    // while (running)
-    // {
-    //     while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-    //     {
-    //         if (msg.message == WM_QUIT)
-    //         {
-    //             running = false;
-    //             break;
-    //         }
-    //         TranslateMessage(&msg);
-    //         DispatchMessage(&msg);
-    //     }
-    //
-    //     if (running)
-    //     {
-    //         if (g_theRendererEx)
-    //         {
-    //             g_theRendererEx->Render();
-    //         }
-    //         Sleep(16); // ~60 FPS
-    //     }
-    // }
-
-    // 清理
-    // delete g_theRendererEx;
-    // DestroyWindow(hiddenWindow);
     g_theApp->Shutdown();
-    CoUninitialize();
+
+    GAME_SAFE_RELEASE(g_theApp);
+
     return 0;
-    // g_theApp->RunMainLoop();
-    // g_theApp->Shutdown();
-    //
-    // delete g_theApp;
-    // g_theApp = nullptr;
-    //
-    // return 0;
 }
