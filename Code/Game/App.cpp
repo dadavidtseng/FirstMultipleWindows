@@ -155,7 +155,7 @@ void App::Startup()
     g_theRNG  = new RandomNumberGenerator();
     g_theGame = new Game();
 
-    CreateAndRegisterMultipleWindows(m_hInstance, 3);
+    CreateAndRegisterMultipleWindows(windows, m_hInstance, 3);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -264,7 +264,7 @@ void App::Update()
 
     if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
     {
-        CreateAndRegisterMultipleWindows(m_hInstance, 2);
+        // CreateAndRegisterMultipleWindows(m_hInstance, 2);
     }
 
     // UpdateCursorMode();
@@ -273,6 +273,7 @@ void App::Update()
         window.UpdateWindowDrift((float)Clock::GetSystemClock().GetDeltaSeconds() * 1.5f);
         window.UpdateWindowPosition();
     }
+    g_theRendererEx->UpdateWindows(windows);
     g_theGame->Update();
 }
 
@@ -290,7 +291,7 @@ void App::Render() const
     // g_theRenderer->ClearScreen(clearColor);
     // g_theGame->Render();
 
-    g_theRendererEx->Render(windows);
+    g_theRendererEx->Render();
 
     AABB2 const box = AABB2(Vec2::ZERO, Vec2(1600.f, 30.f));
 
@@ -314,17 +315,17 @@ void App::EndFrame() const
 //----------------------------------------------------------------------------------------------------
 void App::UpdateCursorMode()
 {
-     bool const doesWindowHasFocus   = GetActiveWindow() == g_theWindow->GetWindowHandle();
-    bool const isAttractState       = g_theGame->GetCurrentGameState() == eGameState::ATTRACT;
-     // bool const shouldUsePointerMode = !doesWindowHasFocus || g_theDevConsole->IsOpen() || isAttractState;
-     bool const shouldUsePointerMode = !doesWindowHasFocus  || isAttractState;
+    bool const doesWindowHasFocus = GetActiveWindow() == g_theWindow->GetWindowHandle();
+    bool const isAttractState     = g_theGame->GetCurrentGameState() == eGameState::ATTRACT;
+    // bool const shouldUsePointerMode = !doesWindowHasFocus || g_theDevConsole->IsOpen() || isAttractState;
+    bool const shouldUsePointerMode = !doesWindowHasFocus || isAttractState;
 
-     if (shouldUsePointerMode == true)
-     {
-         g_theInput->SetCursorMode(eCursorMode::POINTER);
-     }
-     else
-     {
-         g_theInput->SetCursorMode(eCursorMode::FPS);
-     }
+    if (shouldUsePointerMode == true)
+    {
+        g_theInput->SetCursorMode(eCursorMode::POINTER);
+    }
+    else
+    {
+        g_theInput->SetCursorMode(eCursorMode::FPS);
+    }
 }

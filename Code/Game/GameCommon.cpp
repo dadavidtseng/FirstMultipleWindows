@@ -287,7 +287,7 @@ void DebugDrawBoxRing(Vec2 const& center, float radius, float thickness, Rgba8 c
     // g_theRendererEx->DrawVertexArray(24, &verts[0]);
 }
 
-void CreateAndRegisterMultipleWindows(HINSTANCE hInstance, int windowCount)
+void CreateAndRegisterMultipleWindows(std::vector<WindowEx>& windows, HINSTANCE hInstance, int windowCount)
 {
     const int width   = 400;
     const int height  = 300;
@@ -307,6 +307,7 @@ void CreateAndRegisterMultipleWindows(HINSTANCE hInstance, int windowCount)
         {
             g_gameWindows.push_back(hwnd);
             g_theApp->AddWindow(hwnd);
+            g_theRendererEx->CreateWindowSwapChain(windows[i]);
         }
     }
 }

@@ -6,6 +6,7 @@
 #pragma once
 #include <vector>
 #include <windows.h>
+class WindowEx;
 //-Forward-Declaration--------------------------------------------------------------------------------
 struct Rgba8;
 struct Vec2;
@@ -53,5 +54,5 @@ void GAME_SAFE_RELEASE(T*& pointer)
     }
 }
 
-void CreateAndRegisterMultipleWindows(HINSTANCE hInstance, int windowCount);
+void CreateAndRegisterMultipleWindows(std::vector<WindowEx>& windows, HINSTANCE hInstance, int windowCount);
 HWND CreateGameWindow(HINSTANCE hInstance, const wchar_t* title, int x, int y, int width, int height);
