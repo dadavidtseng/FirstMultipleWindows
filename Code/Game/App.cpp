@@ -240,6 +240,7 @@ void App::AddWindow(HWND const& hwnd)
     window.needsUpdate      = true;
 
     // UpdateWindowPosition(window);
+    HRESULT hr = g_theRendererEx->CreateWindowSwapChain(window);
     windows.push_back(window);
 }
 
@@ -264,7 +265,7 @@ void App::Update()
 
     if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
     {
-        // CreateAndRegisterMultipleWindows(m_hInstance, 2);
+        CreateAndRegisterMultipleWindows(windows,m_hInstance, 2);
     }
 
     // UpdateCursorMode();
