@@ -69,12 +69,12 @@ void App::Startup()
     // windowConfig.m_windowTitle = "DEFAULT";
     // g_theWindow                = new Window(windowConfig);
 
-    // sWindowExConfig windowExConfig;
-    // windowExConfig.m_aspectRatio  = 2.f;
-    // windowExConfig.m_inputSystem  = g_theInput;
-    // windowExConfig.m_windowTitle  = "FirstMultipleWindows";
-    // windowExConfig.m_iconFilePath = L"C:/p4/Personal/SD/FirstMultipleWindows/Run/Data/Images/Test_StbiFlippedAndOpenGL.ico";
-    // g_theWindowEx                 = new WindowEx(windowExConfig);
+    sWindowExConfig windowExConfig;
+    windowExConfig.m_aspectRatio  = 2.f;
+    windowExConfig.m_inputSystem  = g_theInput;
+    windowExConfig.m_windowTitle  = "FirstMultipleWindows";
+    windowExConfig.m_iconFilePath = L"C:/p4/Personal/SD/FirstMultipleWindows/Run/Data/Images/Test_StbiFlippedAndOpenGL.ico";
+    g_theWindowEx                 = new WindowEx(windowExConfig);
 
 
     //-End-of-Window----------------------------------------------------------------------------------
@@ -90,10 +90,7 @@ void App::Startup()
     // g_theRendererEx         = new RendererEx(renderExConfig);
     // 初始化渲染器
     g_theRendererEx = new RendererEx();
-    if (FAILED(g_theRendererEx->Initialize()))
-    {
-        MessageBox(nullptr, L"Failed to initialize renderer", L"Error", MB_OK);
-    }
+
 
     //-End-of-Renderer--------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
@@ -131,19 +128,7 @@ void App::Startup()
 
     g_theEventSystem->Startup();
     // g_theWindow->Startup();
-    // g_theWindowEx->Startup();
-    // WindowEx* window1             = g_theWindowEx->CreateChildWindow(L"ChildWindow", 100, 100, 400, 300);
-    // WindowEx* window2             = g_theWindowEx->CreateChildWindow(L"ChildWindow", 600, 200, 400, 300);
-    // WindowEx* window3             = g_theWindowEx->CreateChildWindow(L"ChildWindow 3", 300, 400, 400, 300);
-    // if (window1 != nullptr)
-    // {
-    //     m_windowExs.push_back(window1);
-    // }
-    // if (window2 != nullptr)
-    // {
-    //     m_windowExs.push_back(window2);
-    // }
-    // m_windowExs.push_back(window3);
+    g_theWindowEx->Startup();
     // g_theRenderer->Startup();
     g_theRendererEx->Startup();
     // DebugRenderSystemStartup(debugConfig);
@@ -234,7 +219,8 @@ STATIC void App::RequestQuit()
 
 void App::AddWindow(HWND const& hwnd)
 {
-    WindowEx window;
+    sWindowExConfig config;
+    WindowEx window = WindowEx(config);
     window.m_windowHandle   = hwnd;
     window.m_displayContext = GetDC(hwnd);
     window.needsUpdate      = true;
@@ -265,7 +251,7 @@ void App::Update()
 
     if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
     {
-        CreateAndRegisterMultipleWindows(windows,m_hInstance, 2);
+        CreateAndRegisterMultipleWindows(windows, m_hInstance, 2);
     }
 
     // UpdateCursorMode();
