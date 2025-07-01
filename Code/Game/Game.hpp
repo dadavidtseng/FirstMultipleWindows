@@ -7,6 +7,7 @@
 #include <cstdint>
 
 #include "Engine/Core/EventSystem.hpp"
+#include "Engine/Math/Vec2.hpp"
 
 //-Forward-Declaration--------------------------------------------------------------------------------
 class Camera;
@@ -34,7 +35,8 @@ public:
 
     eGameState GetCurrentGameState() const;
     void       ChangeGameState(eGameState newGameState);
-
+    Vec2 m_position = Vec2::ZERO;
+    Vec2 m_windowPosition = Vec2::ZERO;
 private:
     void UpdateFromInput();
     void AdjustForPauseAndTimeDistortion();
@@ -44,4 +46,5 @@ private:
     Camera*    m_screenCamera = nullptr;
     eGameState m_gameState    = eGameState::ATTRACT;
     Clock*     m_gameClock    = nullptr;
+
 };

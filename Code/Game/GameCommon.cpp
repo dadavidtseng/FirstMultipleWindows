@@ -9,9 +9,10 @@
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Math/MathUtils.hpp"
-#include "Engine/Platform/WindowEx.hpp"
+#include "Engine/Platform/Window.hpp"
+
 #include "Engine/Renderer/Renderer.hpp"
-#include "Engine/Renderer/RendererEx.hpp"
+// #include "Engine/Renderer/RendererEx.hpp"
 
 //-----------------------------------------------------------------------------------------------
 // DebugRender color-related
@@ -27,14 +28,14 @@ Rgba8 const DEBUG_RENDER_YELLOW  = Rgba8(255, 255, 0);
 //-----------------------------------------------------------------------------------------------
 void DebugDrawRing(Vec2 const& center, float radius, float thickness, Rgba8 const& color)
 {
-    float         halfThickness = 0.5f * thickness;
-    float         innerRadius   = radius - halfThickness;
-    float         outerRadius   = radius + halfThickness;
-    constexpr int NUM_SIDES     = 32;
-    constexpr int NUM_TRIS      = 2 * NUM_SIDES;
-    constexpr int NUM_VERTS     = 3 * NUM_TRIS;
-    Vertex_PCU    verts[NUM_VERTS];
-
+    float           halfThickness = 0.5f * thickness;
+    float           innerRadius   = radius - halfThickness;
+    float           outerRadius   = radius + halfThickness;
+    constexpr int   NUM_SIDES     = 32;
+    constexpr int   NUM_TRIS      = 2 * NUM_SIDES;
+    constexpr int   NUM_VERTS     = 3 * NUM_TRIS;
+    Vertex_PCU      verts[NUM_VERTS];
+    VertexList_PCU  vertex_list;
     constexpr float DEGREES_PER_SIDE = 360.f / static_cast<float>(NUM_SIDES);
 
     for (int sideNum = 0; sideNum < NUM_SIDES; ++sideNum)
@@ -76,15 +77,22 @@ void DebugDrawRing(Vec2 const& center, float radius, float thickness, Rgba8 cons
         verts[vertIndexD].m_color    = color;
         verts[vertIndexE].m_color    = color;
         verts[vertIndexF].m_color    = color;
+        vertex_list.push_back(verts[vertIndexA]);
+        vertex_list.push_back(verts[vertIndexB]);
+        vertex_list.push_back(verts[vertIndexC]);
+        vertex_list.push_back(verts[vertIndexD]);
+        vertex_list.push_back(verts[vertIndexE]);
+        vertex_list.push_back(verts[vertIndexF]);
     }
 
-    // g_theRendererEx->SetModelConstants();
-    // g_theRendererEx->SetBlendMode(RendererEx::eBlendMode::ALPHA);
-    // g_theRendererEx->SetRasterizerMode(RendererEx::eRasterizerMode::SOLID_CULL_NONE);
-    // g_theRendererEx->SetSamplerMode(RendererEx::eSamplerMode::POINT_CLAMP);
-    // g_theRendererEx->SetDepthMode(RendererEx::eDepthMode::DISABLED);
-    // g_theRendererEx->BindTexture(nullptr);
-    // g_theRendererEx->DrawVertexArray(NUM_VERTS, &verts[0]);
+    g_theRenderer->SetModelConstants();
+    g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
+    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+    g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+    g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
+    g_theRenderer->BindTexture(nullptr);
+    g_theRenderer->BindShader(g_theRenderer->CreateOrGetShaderFromFile("Data/Shaders/Default"));
+    g_theRenderer->DrawVertexArray(NUM_VERTS, &verts[0]);
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -116,13 +124,14 @@ void DebugDrawLine(Vec2 const& start, Vec2 const& end, float thickness, Rgba8 co
     verts[4].m_color    = color;
     verts[5].m_color    = color;
 
-    // g_theRendererEx->SetModelConstants();
-    // g_theRendererEx->SetBlendMode(RendererEx::eBlendMode::ALPHA);
-    // g_theRendererEx->SetRasterizerMode(RendererEx::eRasterizerMode::SOLID_CULL_NONE);
-    // g_theRendererEx->SetSamplerMode(RendererEx::eSamplerMode::POINT_CLAMP);
-    // g_theRendererEx->SetDepthMode(RendererEx::eDepthMode::DISABLED);
-    // g_theRendererEx->BindTexture(nullptr);
-    // g_theRendererEx->DrawVertexArray(6, &verts[0]);
+    g_theRenderer->SetModelConstants();
+    g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
+    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+    g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+    g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
+    g_theRenderer->BindTexture(nullptr);
+    g_theRenderer->BindShader(g_theRenderer->CreateOrGetShaderFromFile("Data/Shaders/Default"));
+    g_theRenderer->DrawVertexArray(6, &verts[0]);
 }
 
 //------------------------------------------------------------------------------------------------
@@ -287,7 +296,7 @@ void DebugDrawBoxRing(Vec2 const& center, float radius, float thickness, Rgba8 c
     // g_theRendererEx->DrawVertexArray(24, &verts[0]);
 }
 
-void CreateAndRegisterMultipleWindows(std::vector<WindowEx>& windows, HINSTANCE hInstance, int windowCount)
+void CreateAndRegisterMultipleWindows(std::vector<Window>& windows, HINSTANCE hInstance, int windowCount)
 {
     const int width   = 400;
     const int height  = 300;
@@ -307,7 +316,7 @@ void CreateAndRegisterMultipleWindows(std::vector<WindowEx>& windows, HINSTANCE 
         {
             g_gameWindows.push_back(hwnd);
             g_theApp->AddWindow(hwnd);
-            g_theRendererEx->CreateWindowSwapChain(windows[i]);
+            g_theRenderer->CreateWindowSwapChain(windows[i]);
         }
     }
 }

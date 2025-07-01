@@ -197,7 +197,8 @@ float4 PixelMain( VertexOutPixelIn input ) : SV_Target0
 
 	// #ToDo: add lighting and such later!
 	float4 finalColor = diffuseColor;
-	if( finalColor.a <= 0.001 ) // a.k.a. "clip" in HLSL
+
+	if( finalColor.a <= 0.001 ) // a.k.a. "clip" in HLSL0
 	{
 		discard;
 	}

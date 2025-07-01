@@ -6,7 +6,7 @@
 #pragma once
 #include <vector>
 #include <windows.h>
-class WindowEx;
+class Window;
 //-Forward-Declaration--------------------------------------------------------------------------------
 struct Rgba8;
 struct Vec2;
@@ -15,7 +15,6 @@ class AudioSystem;
 class BitmapFont;
 class Game;
 class Renderer;
-class RendererEx;
 class RandomNumberGenerator;
 
 // one-time declaration
@@ -24,15 +23,14 @@ extern AudioSystem*           g_theAudio;
 extern BitmapFont*            g_theBitmapFont;
 extern Game*                  g_theGame;
 extern Renderer*              g_theRenderer;
-extern RendererEx*            g_theRendererEx;
 extern RandomNumberGenerator* g_theRNG;
 extern std::vector<HWND>      g_gameWindows;
 
 //-----------------------------------------------------------------------------------------------
 // initial settings
 //
-float constexpr SCREEN_SIZE_X = 1600.f;
-float constexpr SCREEN_SIZE_Y = 800.f;
+float constexpr SCREEN_SIZE_X = 1920.f;
+float constexpr SCREEN_SIZE_Y = 1080.f;
 
 //-----------------------------------------------------------------------------------------------
 // DebugRender-related
@@ -54,5 +52,5 @@ void GAME_SAFE_RELEASE(T*& pointer)
     }
 }
 
-void CreateAndRegisterMultipleWindows(std::vector<WindowEx>& windows, HINSTANCE hInstance, int windowCount);
+void CreateAndRegisterMultipleWindows(std::vector<Window>& windows, HINSTANCE hInstance, int windowCount);
 HWND CreateGameWindow(HINSTANCE hInstance, const wchar_t* title, int x, int y, int width, int height);

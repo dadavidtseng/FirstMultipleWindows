@@ -11,7 +11,7 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
-#include "Engine/Renderer/RendererEx.hpp"
+// #include "Engine/Renderer/RendererEx.hpp"
 #include "Game/App.hpp"
 #include "Game/GameCommon.hpp"
 
@@ -22,8 +22,8 @@ Game::Game()
     m_screenCamera = new Camera();
 
     Vec2 const bottomLeft     = Vec2::ZERO;
-    // Vec2 const screenTopRight = Vec2(SCREEN_SIZE_X, SCREEN_SIZE_Y);
-    Vec2 const screenTopRight = Vec2(1920.0f, 1080.0f);
+    Vec2 const screenTopRight = Vec2(SCREEN_SIZE_X, SCREEN_SIZE_Y);
+    // Vec2 const screenTopRight = Vec2(1920.0f, 1080.0f);
 
     m_screenCamera->SetOrthoGraphicView(bottomLeft, screenTopRight);
     m_screenCamera->SetNormalizedViewport(AABB2::ZERO_TO_ONE);
@@ -48,23 +48,23 @@ void Game::Update()
 void Game::Render() const
 {
     //-Start-of-Screen-Camera-------------------------------------------------------------------------
-    // g_theRenderer->BeginCamera(*m_screenCamera);
+    g_theRenderer->BeginCamera(*m_screenCamera);
 
     if (m_gameState == eGameState::ATTRACT)
     {
-        // RenderAttractMode();
+        RenderAttractMode();
     }
     else if (m_gameState == eGameState::GAME)
     {
-        // RenderGame();
+        RenderGame();
     }
 
-    // g_theRenderer->EndCamera(*m_screenCamera);
+    g_theRenderer->EndCamera(*m_screenCamera);
     //-End-of-Screen-Camera---------------------------------------------------------------------------
 
     if (m_gameState == eGameState::GAME)
     {
-        // DebugRenderScreen(*m_screenCamera);
+        // DebugRenderScreen(b*m_screenCamera);
     }
 }
 
@@ -113,6 +113,46 @@ void Game::UpdateFromInput()
 {
     if (m_gameState == eGameState::ATTRACT)
     {
+        if (g_theInput->IsKeyDown(KEYCODE_W)) m_position.y += 10.f;
+        if (g_theInput->IsKeyDown(KEYCODE_A)) m_position.x -= 10.f;
+        if (g_theInput->IsKeyDown(KEYCODE_S)) m_position.y -= 10.f;
+        if (g_theInput->IsKeyDown(KEYCODE_D)) m_position.x += 10.f;
+        if (g_theInput->IsKeyDown(KEYCODE_L))
+        {
+            m_windowPosition.x += 10.f;
+            for (Window& window : g_theApp->windows)
+            {
+                window.UpdateWindowPosition(Vec2(m_windowPosition.x, m_windowPosition.y));
+            }
+        }
+        if (g_theInput->IsKeyDown(KEYCODE_J))
+        {
+            m_windowPosition.x -= 10.f;
+            for (Window& window : g_theApp->windows)
+            {
+                window.UpdateWindowPosition(Vec2(m_windowPosition.x, m_windowPosition.y));
+            }
+        }
+
+        if (g_theInput->IsKeyDown(KEYCODE_I))
+        {
+            m_windowPosition.y += 10.f;
+            for (Window& window : g_theApp->windows)
+            {
+                window.UpdateWindowPosition(Vec2(m_windowPosition.x, m_windowPosition.y));
+            }
+        }
+
+        if (g_theInput->IsKeyDown(KEYCODE_K))
+        {
+            m_windowPosition.y -= 10.f;
+
+            for (Window& window : g_theApp->windows)
+            {
+                window.UpdateWindowPosition(Vec2(m_windowPosition.x, m_windowPosition.y));
+            }
+        }
+
         if (g_theInput->WasKeyJustPressed(KEYCODE_ESC))
         {
             App::RequestQuit();
@@ -170,12 +210,13 @@ void Game::RenderAttractMode() const
     g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
     g_theRenderer->SetSamplerMode(eSamplerMode::BILINEAR_CLAMP);
     g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
-    g_theRenderer->BindTexture(nullptr);
-    g_theRenderer->BindTexture(g_theRenderer->CreateOrGetTextureFromFile("Data/Images/Test_StbiFlippedAndOpenGL.png"));
+    // g_theRenderer->BindTexture(nullptr);
+    g_theRenderer->BindTexture(g_theRenderer->CreateOrGetTextureFromFile("Data/Images/WindowKill.png"));
     g_theRenderer->BindShader(g_theRenderer->CreateOrGetShaderFromFile("Data/Shaders/Default"));
     g_theRenderer->DrawVertexArray(verts);
 
-    // DebugDrawRing(Vec2(800.f, 400.f), 300.f, 10.f, Rgba8::YELLOW);
+
+    DebugDrawRing(Vec2(SCREEN_SIZE_X * 0.5f + m_position.x, SCREEN_SIZE_Y * 0.5f + m_position.y), 300.f, 10.f, Rgba8::YELLOW);
 }
 
 //----------------------------------------------------------------------------------------------------
