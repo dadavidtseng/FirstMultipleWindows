@@ -72,14 +72,6 @@ void App::Startup()
     windowConfig.m_iconFilePath = L"C:/p4/Personal/SD/FirstMultipleWindows/Run/Data/Images/Test_StbiFlippedAndOpenGL.ico";
     g_theWindow                 = new Window(windowConfig);
 
-    // sWindowExConfig windowExConfig;
-    // windowExConfig.m_aspectRatio  = 2.f;
-    // windowExConfig.m_inputSystem  = g_theInput;
-    // windowExConfig.m_windowTitle  = "FirstMultipleWindows";
-    // windowExConfig.m_iconFilePath = L"C:/p4/Personal/SD/FirstMultipleWindows/Run/Data/Images/Test_StbiFlippedAndOpenGL.ico";
-    // g_theWindowEx                 = new WindowEx(windowExConfig);
-
-
     //-End-of-Window----------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
     //-Start-of-Renderer------------------------------------------------------------------------------
@@ -87,13 +79,6 @@ void App::Startup()
     sRenderConfig renderConfig;
     renderConfig.m_window = g_theWindow;
     g_theRenderer         = new Renderer(renderConfig);
-
-    // RendererEx::sRenderExConfig renderExConfig;
-    // renderExConfig.m_window = g_theWindowEx;
-    // g_theRendererEx         = new RendererEx(renderExConfig);
-    // 初始化渲染器
-    // g_theRendererEx = new RendererEx();
-
 
     //-End-of-Renderer--------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
@@ -131,9 +116,7 @@ void App::Startup()
 
     g_theEventSystem->Startup();
     g_theWindow->Startup();
-    // g_theWindowEx->Startup();
     g_theRenderer->Startup();
-    // g_theRendererEx->Startup();
     DebugRenderSystemStartup(debugConfig);
     g_theDevConsole->StartUp();
     g_theInput->Startup();
@@ -143,7 +126,7 @@ void App::Startup()
     g_theRNG        = new RandomNumberGenerator();
     g_theGame       = new Game();
 
-    CreateAndRegisterMultipleWindows(windows, m_hInstance, 3);
+    CreateAndRegisterMultipleWindows(windows, m_hInstance, 2);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -168,9 +151,7 @@ void App::Shutdown()
     GAME_SAFE_RELEASE(m_devConsoleCamera);
 
     DebugRenderSystemShutdown();
-    // g_theRendererEx->Shutdown();
     g_theRenderer->Shutdown();
-    // g_theWindowEx->Shutdown();
     g_theWindow->Shutdown();
     g_theEventSystem->Shutdown();
 
@@ -260,10 +241,7 @@ void App::Update()
         window.UpdateWindowPosition();
     }
 
-    // g_theRendererEx->UpdateWindows(windows);
-    // g_theRenderer->UpdateWindows(windows);
-
-    // UpdateWindows(windows);
+    UpdateWindowsResizeIfNeeded(windows);
 
     g_theGame->Update();
 }
@@ -280,7 +258,7 @@ void App::Render() const
     g_theRenderer->ClearScreen(Rgba8::BLUE);
     g_theGame->Render();
     g_theRenderer->Render();
-    UpdateWindows(windows);
+    RenderWindows(windows); // 安全地呼叫，不會改變狀態
 
     AABB2 const box = AABB2(Vec2::ZERO, Vec2(1600.f, 30.f));
 
@@ -316,7 +294,7 @@ void App::UpdateCursorMode()
     }
 }
 
-void App::UpdateWindows(std::vector<Window> windows) const
+void App::UpdateWindows(std::vector<Window>& windows) const
 {
     for (int i = 0; i < windows.size(); ++i)
     {
@@ -334,9 +312,41 @@ void App::UpdateWindows(std::vector<Window> windows) const
         if (windows[i].needsUpdate)
         {
             // 使用 DirectX 11 版本渲染
-            // g_theRenderer->RenderViewportToWindowDX11(windows[i]);
-            g_theRenderer->RenderViewportToWindow(windows[i]);
+            g_theRenderer->RenderViewportToWindowDX11(windows[i]);
+            // g_theRenderer->RenderViewportToWindow(windows[i]);
             // window.needsUpdate = false;
+        }
+    }
+}
+
+void App::RenderWindows(const std::vector<Window>& windows) const
+{
+    for (const Window& window : windows)
+    {
+        if (window.needsUpdate)
+        {
+            g_theRenderer->RenderViewportToWindow(window);
+            // g_theRenderer->RenderViewportToWindowDX11(window);
+        }
+    }
+}
+
+void App::UpdateWindowsResizeIfNeeded(std::vector<Window>& windows)
+{
+    for (Window& window : windows)
+    {
+        if (window.needsResize)
+        {
+            HRESULT hr         = g_theRenderer->ResizeWindowSwapChain(window);
+            window.needsResize = false;
+
+            if (FAILED(hr))
+            {
+                DebuggerPrintf("Failed to resize window swap chain: 0x%08X\n", hr);
+                continue;
+            }
+
+            window.needsUpdate = true;
         }
     }
 }

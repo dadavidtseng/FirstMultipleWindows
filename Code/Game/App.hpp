@@ -28,9 +28,12 @@ public:
     static void RequestQuit();
     static bool m_isQuitting;
 
-    void AddWindow(HWND const& hwnd);
+    void                AddWindow(HWND const& hwnd);
     std::vector<Window> windows;
-    void UpdateWindows(std::vector<Window> windows) const;
+    void                UpdateWindows(std::vector<Window>& windows) const;
+    void                RenderWindows(const std::vector<Window>& windows) const;
+    void                UpdateWindowsResizeIfNeeded(std::vector<Window>& windows);
+
 private:
     void BeginFrame() const;
     void Update();
@@ -39,8 +42,6 @@ private:
     void UpdateCursorMode();
 
 
-
-    HINSTANCE           m_hInstance;
-    Camera*             m_devConsoleCamera = nullptr;
-
+    HINSTANCE m_hInstance;
+    Camera*   m_devConsoleCamera = nullptr;
 };

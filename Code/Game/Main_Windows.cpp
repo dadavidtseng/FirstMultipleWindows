@@ -9,11 +9,8 @@
 #include <OleCtl.h>
 #include <windows.h>			// #include this (massive, platform-specific) header in VERY few places (and .CPPs only)
 #include "Engine/Core/EngineCommon.hpp"
-// #include "Engine/Renderer/RendererEx.hpp"
 #include "Game/App.hpp"
 #include "Game/GameCommon.hpp"
-
-RendererEx* g_theRendererEx = nullptr;       // Created and owned by the App
 
 //-----------------------------------------------------------------------------------------------
 int WINAPI WinMain(HINSTANCE const applicationInstanceHandle,

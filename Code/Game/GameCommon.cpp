@@ -1,99 +1,16 @@
-//-----------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 // GameCommon.cpp
-//
+//----------------------------------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 #include "Game/GameCommon.hpp"
 
-#include "App.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Platform/Window.hpp"
-
 #include "Engine/Renderer/Renderer.hpp"
-// #include "Engine/Renderer/RendererEx.hpp"
-
-//-----------------------------------------------------------------------------------------------
-// DebugRender color-related
-//
-Rgba8 const DEBUG_RENDER_GREY    = Rgba8(50, 50, 50);
-Rgba8 const DEBUG_RENDER_RED     = Rgba8(255, 0, 0);
-Rgba8 const DEBUG_RENDER_GREEN   = Rgba8(0, 255, 0);
-Rgba8 const DEBUG_RENDER_MAGENTA = Rgba8(255, 0, 255);
-Rgba8 const DEBUG_RENDER_CYAN    = Rgba8(0, 255, 255);
-Rgba8 const DEBUG_RENDER_YELLOW  = Rgba8(255, 255, 0);
-
-
-//-----------------------------------------------------------------------------------------------
-void DebugDrawRing(Vec2 const& center, float radius, float thickness, Rgba8 const& color)
-{
-    float           halfThickness = 0.5f * thickness;
-    float           innerRadius   = radius - halfThickness;
-    float           outerRadius   = radius + halfThickness;
-    constexpr int   NUM_SIDES     = 32;
-    constexpr int   NUM_TRIS      = 2 * NUM_SIDES;
-    constexpr int   NUM_VERTS     = 3 * NUM_TRIS;
-    Vertex_PCU      verts[NUM_VERTS];
-    VertexList_PCU  vertex_list;
-    constexpr float DEGREES_PER_SIDE = 360.f / static_cast<float>(NUM_SIDES);
-
-    for (int sideNum = 0; sideNum < NUM_SIDES; ++sideNum)
-    {
-        // Compute angle-related terms
-        float startDegrees = DEGREES_PER_SIDE * static_cast<float>(sideNum);
-        float endDegrees   = DEGREES_PER_SIDE * static_cast<float>(sideNum + 1);
-        float cosStart     = CosDegrees(startDegrees);
-        float sinStart     = SinDegrees(startDegrees);
-        float cosEnd       = CosDegrees(endDegrees);
-        float sinEnd       = SinDegrees(endDegrees);
-
-        // Compute inner & outer positions
-        Vec3 innerStartPos(center.x + innerRadius * cosStart, center.y + innerRadius * sinStart, 0.f);
-        Vec3 outerStartPos(center.x + outerRadius * cosStart, center.y + outerRadius * sinStart, 0.f);
-        Vec3 outerEndPos(center.x + outerRadius * cosEnd, center.y + outerRadius * sinEnd, 0.f);
-        Vec3 innerEndPos(center.x + innerRadius * cosEnd, center.y + innerRadius * sinEnd, 0.f);
-
-        // Trapezoid is made of two triangles; ABC and DEF
-        // A is inner end; B is inner start; C is outer start
-        // D is inner end; E is outer start; F is outer end
-        int vertIndexA = 6 * sideNum + 0;
-        int vertIndexB = 6 * sideNum + 1;
-        int vertIndexC = 6 * sideNum + 2;
-        int vertIndexD = 6 * sideNum + 3;
-        int vertIndexE = 6 * sideNum + 4;
-        int vertIndexF = 6 * sideNum + 5;
-
-        verts[vertIndexA].m_position = innerEndPos;
-        verts[vertIndexB].m_position = innerStartPos;
-        verts[vertIndexC].m_position = outerStartPos;
-        verts[vertIndexA].m_color    = color;
-        verts[vertIndexB].m_color    = color;
-        verts[vertIndexC].m_color    = color;
-
-        verts[vertIndexD].m_position = innerEndPos;
-        verts[vertIndexE].m_position = outerStartPos;
-        verts[vertIndexF].m_position = outerEndPos;
-        verts[vertIndexD].m_color    = color;
-        verts[vertIndexE].m_color    = color;
-        verts[vertIndexF].m_color    = color;
-        vertex_list.push_back(verts[vertIndexA]);
-        vertex_list.push_back(verts[vertIndexB]);
-        vertex_list.push_back(verts[vertIndexC]);
-        vertex_list.push_back(verts[vertIndexD]);
-        vertex_list.push_back(verts[vertIndexE]);
-        vertex_list.push_back(verts[vertIndexF]);
-    }
-
-    g_theRenderer->SetModelConstants();
-    g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
-    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
-    g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
-    g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
-    g_theRenderer->BindTexture(nullptr);
-    g_theRenderer->BindShader(g_theRenderer->CreateOrGetShaderFromFile("Data/Shaders/Default"));
-    g_theRenderer->DrawVertexArray(NUM_VERTS, &verts[0]);
-}
+#include "Game/App.hpp"
 
 //-----------------------------------------------------------------------------------------------
 void DebugDrawLine(Vec2 const& start, Vec2 const& end, float thickness, Rgba8 const& color)
@@ -328,7 +245,7 @@ HWND CreateGameWindow(HINSTANCE hInstance, const wchar_t* title, int x, int y, i
     if (!classRegistered)
     {
         WNDCLASS wc      = {};
-        wc.lpfnWndProc   = WindowsMessageHandlingProcedure;
+        wc.lpfnWndProc   = (WNDPROC)GetWindowLongPtr((HWND)Window::s_mainWindow->GetWindowHandle(), GWLP_WNDPROC);
         wc.hInstance     = hInstance;
         wc.lpszClassName = L"GameWindow";
         wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
@@ -338,12 +255,19 @@ HWND CreateGameWindow(HINSTANCE hInstance, const wchar_t* title, int x, int y, i
         classRegistered = true;
     }
 
+    // 調整視窗大小，確保客戶區域是指定的 width 和 height
+    RECT rect = {0, 0, width, height};
+    AdjustWindowRectEx(&rect, WS_OVERLAPPEDWINDOW, FALSE, 0);
+
+    int adjustedWidth  = rect.right - rect.left;
+    int adjustedHeight = rect.bottom - rect.top;
+
     HWND hwnd = CreateWindowEx(
         0,
         L"GameWindow",
         title,
         WS_OVERLAPPEDWINDOW,
-        x, y, width, height,
+        x, y, adjustedWidth, adjustedHeight,
         nullptr,
         nullptr,
         hInstance,
