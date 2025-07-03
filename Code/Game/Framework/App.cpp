@@ -3,7 +3,7 @@
 //----------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
-#include "Game/App.hpp"
+#include "Game/Framework/App.hpp"
 
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/Clock.hpp"
@@ -13,25 +13,21 @@
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
-// #include "Engine/Renderer/RendererEx.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Platform/Window.hpp"
-// #include "Engine/Platform/WindowEx.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
-#include "Game/Game.hpp"
-#include "Game/GameCommon.hpp"
+#include "Game/Gameplay/Game.hpp"
+#include "Game/Framework/GameCommon.hpp"
 
 //----------------------------------------------------------------------------------------------------
-App*         g_theApp        = nullptr;       // Created and owned by Main_Windows.cpp
-AudioSystem* g_theAudio      = nullptr;       // Created and owned by the App
-BitmapFont*  g_theBitmapFont = nullptr;       // Created and owned by the App
-Game*        g_theGame       = nullptr;       // Created and owned by the App
-Renderer*    g_theRenderer   = nullptr;       // Created and owned by the App
-
-RandomNumberGenerator* g_theRNG    = nullptr;       // Created and owned by the App
-Window*                g_theWindow = nullptr;       // Created and owned by the App
-// WindowEx*              g_theWindowEx = nullptr;       // Created and owned by the App
-std::vector<HWND> g_gameWindows;
+App*                   g_theApp        = nullptr;       // Created and owned by Main_Windows.cpp
+AudioSystem*           g_theAudio      = nullptr;       // Created and owned by the App
+BitmapFont*            g_theBitmapFont = nullptr;       // Created and owned by the App
+Game*                  g_theGame       = nullptr;       // Created and owned by the App
+Renderer*              g_theRenderer   = nullptr;       // Created and owned by the App
+RandomNumberGenerator* g_theRNG        = nullptr;       // Created and owned by the App
+Window*                g_theWindow     = nullptr;       // Created and owned by the App
+std::vector<HWND>      g_gameWindows;
 
 //----------------------------------------------------------------------------------------------------
 STATIC bool App::m_isQuitting = false;
@@ -312,8 +308,8 @@ void App::UpdateWindows(std::vector<Window>& windows) const
         if (windows[i].needsUpdate)
         {
             // 使用 DirectX 11 版本渲染
-            g_theRenderer->RenderViewportToWindowDX11(windows[i]);
-            // g_theRenderer->RenderViewportToWindow(windows[i]);
+            // g_theRenderer->RenderViewportToWindowDX11(windows[i]);
+            g_theRenderer->RenderViewportToWindow(windows[i]);
             // window.needsUpdate = false;
         }
     }
